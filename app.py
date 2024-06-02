@@ -1,7 +1,7 @@
 from tkinter import *
-from mydb import Database
+from Database.mydb import Database
 from tkinter import messagebox
-from myapi import SentimentAnalyzer
+from apis.myapi import SentimentAnalyzer, LanguageDetector, EmotionPredictor
 
 class NLPApp:
 
@@ -10,6 +10,8 @@ class NLPApp:
         # create db object
         self.dbo = Database()
         self.apio = SentimentAnalyzer()
+        self.api2=LanguageDetector()
+        self.api3=EmotionPredictor()
 
         # login ka gui load karna
         self.root = Tk()
@@ -127,12 +129,12 @@ class NLPApp:
         sentiment_btn = Button(self.root, text='Sentiment Analysis', width=30, height=4, command=self.sentiment_gui)
         sentiment_btn.pack(pady=(10, 10))
 
-        ner_btn = Button(self.root, text='Named Entity Recognition', width=30, height=4,
-                               command=self.perform_registration)
+        ner_btn = Button(self.root, text='Language Detector', width=30, height=4,
+                               command=self.language_gui)
         ner_btn.pack(pady=(10, 10))
 
         emotion_btn = Button(self.root, text='Emotion Prediction', width=30, height=4,
-                               command=self.perform_registration)
+                               command=self.Emotion_gui)
         emotion_btn.pack(pady=(10, 10))
 
         logout_btn = Button(self.root, text='Logout', command=self.login_gui)
@@ -166,19 +168,116 @@ class NLPApp:
 
         goback_btn = Button(self.root, text='Go Back', command=self.home_gui)
         goback_btn.pack(pady=(10, 10))
+    
+    def language_gui(self):
+
+        self.clear()
+
+        heading = Label(self.root, text='NLPApp', bg='#34495E', fg='white')
+        heading.pack(pady=(30, 30))
+        heading.configure(font=('verdana', 24, 'bold'))
+
+        heading2 = Label(self.root, text='Language Detection', bg='#34495E', fg='white')
+        heading2.pack(pady=(10, 20))
+        heading2.configure(font=('verdana', 20))
+
+        label1 = Label(self.root, text='Enter the text')
+        label1.pack(pady=(10, 10))
+
+        self.language_input = Entry(self.root, width=50)
+        self.language_input.pack(pady=(5, 10), ipady=4)
+
+        language_btn = Button(self.root, text='Detect Language', command=self.do_language_detection)
+        language_btn.pack(pady=(10, 10))
+
+        self.language_result = Label(self.root, text='',bg='#34495E',fg='white')
+        self.language_result.pack(pady=(10, 10))
+        self.language_result.configure(font=('verdana', 16))
+
+
+        goback_btn = Button(self.root, text='Go Back', command=self.home_gui)
+        goback_btn.pack(pady=(10, 10))
+
+    def Emotion_gui(self):
+
+        self.clear()
+
+        heading = Label(self.root, text='NLPApp', bg='#34495E', fg='white')
+        heading.pack(pady=(30, 30))
+        heading.configure(font=('verdana', 24, 'bold'))
+
+        heading2 = Label(self.root, text='Emotion Detection', bg='#34495E', fg='white')
+        heading2.pack(pady=(10, 20))
+        heading2.configure(font=('verdana', 20))
+
+        label1 = Label(self.root, text='Enter the text')
+        label1.pack(pady=(10, 10))
+
+        self.emotion_input = Entry(self.root, width=50)
+        self.emotion_input.pack(pady=(5, 10), ipady=4)
+
+        emotion_btn = Button(self.root, text='Detect Emotion', command=self.do_Emotion_analysis)
+        emotion_btn.pack(pady=(10, 10))
+
+        self.emotion_result = Label(self.root, text='',bg='#34495E',fg='white')
+        self.emotion_result.pack(pady=(10, 10))
+        self.emotion_result.configure(font=('verdana', 16))
+
+
+        goback_btn = Button(self.root, text='Go Back', command=self.home_gui)
+        goback_btn.pack(pady=(10, 10))
 
     def do_sentiment_analysis(self):
 
         text = self.sentiment_input.get()
         result = self.apio.query(text)
 
-        txt=[]
+        y=[]
         for i in result:
             for j in i:
-               txt.append(j)
+                y.append(j['score'])
+                if max(y)==j['score']:
+                    result2=(j['label'])
+                    
 
-        print(txt)
-        self.sentiment_result['text'] = txt
+        print(result2)
+        self.sentiment_result['text'] = result2
+
+    def do_language_detection(self):
+
+        text = self.language_input.get()
+        result = self.api2.query(text)
+
+        y=[]
+        for i in result:
+            for j in i:
+                y.append(j['score'])
+                if max(y)==j['score']:
+                    result2=(j['label'])
+                    
+
+        print(result2)
+        self.language_result['text'] = result2
+
+    def do_Emotion_analysis(self):
+
+        text = self.emotion_input.get()
+        result = self.api3.query(text)
+
+        y=[]
+        for i in result:
+            for j in i:
+                y.append(j['score'])
+                if max(y)==j['score']:
+                    result2=(j['label'])
+                    
+
+        print(result2)
+        self.emotion_result['text'] = result2
+    
+
+
+
 
 nlp = NLPApp()
 
